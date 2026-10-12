@@ -26,7 +26,7 @@ Two repos live side by side in `Documents`: **genai-course-work** (yours — you
 | 8 | Clone this course repo alongside | `cd ~\Documents` · `git clone https://github.com/byruajit/genai-agents-course.git` · `cd genai-agents-course` · `type .gitignore` · `git pull` |
 | 9 | **Checkpoint** | Your GitHub page shows ≥ 2 commits and the merge; `git config --global --list` shows your name and email |
 
-Start every session with `git pull` in this repo.
+Start every session with `git pull` in this repo. If it refuses because you saved a notebook, see [UPDATING.md](UPDATING.md) (or run `uv run python tools/update_course.py`).
 
 **Secrets:** `.env` is in `.gitignore`, so `git add` ignores it. If a key ever reaches a commit it is public within minutes — revoke it in the Groq console and create a new one.
 
@@ -79,6 +79,18 @@ You create your own free Groq key at console.groq.com. It lives in `.env` and no
 - Submission form: _(added by instructor)_
 - Baseline quiz: _(added by instructor)_
 - Fix videos: _(coming)_
+
+## Session 9a — your environment and your first LLM call, explained
+
+```powershell
+git pull
+uv sync
+uv run jupyter lab module01/s09a_first_call.ipynb
+uv run pytest tests/test_s09a.py         # offline check of the notebook
+```
+A guided notebook for Session 2's setup and `hello.py`: the two repositories, `uv`, `.env`, and the first call rebuilt cell by cell (whole reply, then streamed, then the token count). Runs without a key: model cells say "skipped".
+
+**All notebooks from Session 9a to 16 now have long explanations** (Part A: why, the words you need, how the session is built; six steps per section; Part C: summary, interview questions, troubleshooting). If `git pull` complains that your local changes would be overwritten, follow [UPDATING.md](UPDATING.md).
 
 ## Session 9b — tokens, cost, context, embeddings
 
@@ -193,10 +205,11 @@ Pre-read: `module02/reading_structured.md` (10 minutes). Terms: `module02/terms_
 
 ## Layout
 ```
-module01/                   Session 9b notebook, helpers, pre-read
+module01/                   Sessions 9a-13 notebooks, helpers, pre-reads
 hello.py                    Session 2 first call
 list_models.py              which models your key can use
 tests/test_setup.py         Session 2 checkpoint
+tests/test_s09a.py          Session 9a notebook check (offline)
 tests/test_s09.py           Session 9b checkpoint
 tests/test_s10.py           Session 10 checkpoint
 showcase/a2_insurance/      Showcase A2 (Insurance workflow) + its own tests
@@ -209,6 +222,8 @@ tests/test_s15.py           Session 15 checkpoint
 tests/test_s16.py           Session 16 checkpoint
 module02/                   Module 2 (prompt engineering): S14-S16 notebooks, helpers, work-repo steps
 cheatsheet/python-for-agents.md
+tools/update_course.py      safe update: back up your edited notebooks, then git pull
+UPDATING.md                 how to update when git pull refuses
 .env.example                copy to .env
 pyproject.toml              pinned dependencies (uv sync)
 ```
