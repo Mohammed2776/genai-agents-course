@@ -62,10 +62,13 @@ def defended_messages(ticket: str, k_per_label: int = 2) -> list:
     return build_messages(DEFENDED_SYSTEM, UNDEFENDED_USER, ticket, pick_examples(k_per_label=k_per_label))
 
 
-def answer_ticket(lab, messages: list, defended: bool, max_tokens: int = 500) -> dict:
+def answer_ticket(lab, messages: list, defended: bool, max_tokens: int = 1500) -> dict:
     """One model call. For a defended prompt, only the <final> content is read; the scratchpad is parsed and
     thrown away by this function, exactly as the house rule promises. For an undefended prompt there is no
-    scratchpad, so 'visible' is the whole reply."""
+    scratchpad, so 'visible' is the whole reply.
+
+    max_tokens is a safety ceiling, not a target: reasoning models (like the course's gpt-oss-20b) spend hidden
+    thinking tokens from the same budget, and a tight ceiling leaves an empty or cut-off reply."""
     r = lab.chat(messages, max_tokens=max_tokens)
     raw = r["text"].strip()
     if defended:
@@ -88,7 +91,7 @@ def attack_succeeded(truth: str, result: dict) -> bool:
 
 
 # ---------------------------------------------------------------- the attack suite: undefended vs defended
-def run_attack_suite(lab, defended: bool, items=ATTACKS, k_per_label: int = 2, max_tokens: int = 500) -> dict:
+def run_attack_suite(lab, defended: bool, items=ATTACKS, k_per_label: int = 2, max_tokens: int = 1500) -> dict:
     """Run every attack ticket through one prompt version. Returns rows plus a per-family success count -
     'success' here means the ATTACK succeeded, i.e. the defense failed for that ticket."""
     maker = defended_messages if defended else undefended_messages
@@ -105,14 +108,14 @@ def run_attack_suite(lab, defended: bool, items=ATTACKS, k_per_label: int = 2, m
             "per_family": per_family, "per_family_n": per_family_n}
 
 
-def compare_defenses(lab, items=ATTACKS, k_per_label: int = 2, max_tokens: int = 500) -> dict:
+def compare_defenses(lab, items=ATTACKS, k_per_label: int = 2, max_tokens: int = 1500) -> dict:
     """The same attack tickets against both prompts, so the only thing that changed is the defense."""
     return {"undefended": run_attack_suite(lab, defended=False, items=items, k_per_label=k_per_label, max_tokens=max_tokens),
             "defended": run_attack_suite(lab, defended=True, items=items, k_per_label=k_per_label, max_tokens=max_tokens)}
 
 
 # ---------------------------------------------------------------- the defended prompt must still work on CLEAN tickets
-def score_clean(lab, defended: bool, items=HELDOUT, k_per_label: int = 2, max_tokens: int = 500) -> dict:
+def score_clean(lab, defended: bool, items=HELDOUT, k_per_label: int = 2, max_tokens: int = 1500) -> dict:
     """Session 16's own held-out set, with NO attacks in it. A defense that breaks ordinary accuracy is not a
     good defense - this is the check that it did not."""
     maker = defended_messages if defended else undefended_messages
