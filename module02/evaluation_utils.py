@@ -63,8 +63,11 @@ def v2_messages_from_files(repo_path, ticket: str, k_per_label: int = 2) -> list
     return maker(ticket)
 
 
-def answer_with(lab, messages: list, max_tokens: int = 400) -> dict:
-    """One model call that answers a ticket (not a classifier label - a full customer-support reply)."""
+def answer_with(lab, messages: list, max_tokens: int = 1500) -> dict:
+    """One model call that answers a ticket (not a classifier label - a full customer-support reply).
+
+    max_tokens is a safety ceiling, not a target: reasoning models (like the course's gpt-oss-20b) spend hidden
+    thinking tokens from the same budget, and a tight ceiling leaves an empty reply."""
     r = lab.chat(messages, max_tokens=max_tokens)
     return {"text": r["text"].strip(), "truncated": r["truncated"], "tokens": r["prompt_tokens"] + r["completion_tokens"],
             "seconds": r["seconds"], "cached": r["cached"]}
@@ -111,7 +114,7 @@ def parse_verdict(text: str, ids=RUBRIC_IDS) -> dict:
 
 
 def judge_answer(lab, ticket: str, truth: str, answer: str, *, rubric=RUBRIC, guide: str = GUIDE,
-                 format_rule: str = DEFAULT_FORMAT_RULE, max_tokens: int = 300) -> dict:
+                 format_rule: str = DEFAULT_FORMAT_RULE, max_tokens: int = 1500) -> dict:
     """One ticket, one answer, graded. 'verdicts' is None (not raised) when the judge's reply could not be parsed,
     so one bad judge call does not stop the whole run - it shows up as a row to look at, not a crash."""
     r = lab.chat(judge_messages(ticket, truth, answer, rubric=rubric, guide=guide, format_rule=format_rule), max_tokens=max_tokens)
@@ -133,7 +136,7 @@ def shuffle_order(items, seed: int = 0) -> list:
 
 # ---------------------------------------------------------------- scoring one prompt version over the golden set
 def score_prompt(answer_lab, judge_lab, make_answer_messages, items=GOLDEN20, *, rubric=RUBRIC, guide: str = GUIDE,
-                 format_rule: str = DEFAULT_FORMAT_RULE, max_answer_tokens: int = 400) -> dict:
+                 format_rule: str = DEFAULT_FORMAT_RULE, max_answer_tokens: int = 1500) -> dict:
     """Answer every ticket with ONE prompt version, then judge every answer against the rubric."""
     rows = []
     for text, truth in items:
@@ -154,7 +157,7 @@ def pass_rates(rows: list, rubric=RUBRIC) -> dict:
 
 
 def compare_prompts(answer_lab, judge_lab, v1_maker, v2_maker, items=GOLDEN20, *, rubric=RUBRIC, guide: str = GUIDE,
-                    format_rule: str = DEFAULT_FORMAT_RULE, seed: int = 0, max_answer_tokens: int = 400) -> dict:
+                    format_rule: str = DEFAULT_FORMAT_RULE, seed: int = 0, max_answer_tokens: int = 1500) -> dict:
     """v1 and v2, the same twenty tickets, the same judge. The order the two are answered in is shuffled per
     ticket (shuffle_order); the result is the same pass rates either way - this guards against, not relies on, order."""
     first_is_v1 = shuffle_order(items, seed=seed)
