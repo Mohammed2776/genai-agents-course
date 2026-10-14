@@ -220,6 +220,22 @@ double Session 16's, since every ticket is answered AND judged, for both prompts
 `genai-course-work` repository; your Session 16 `prompts/support_classifier/` files are read, not changed. The checkpoint test is skipped without a key
 (read the reason with `-rs`: a skip is not a pass).
 
+## Session 18 — defensive prompting: attacking your own classifier, on purpose
+
+```powershell
+git pull
+uv sync                                  # no new packages
+uv run jupyter lab module02/s18_defensive_prompting.ipynb
+$env:WORK_REPO = "$HOME\Documents\genai-course-work"
+uv run pytest tests/test_s18.py -rs      # checkpoint: a complete defense report, 16 attacks x 2 prompts, + clean accuracy held
+```
+Pre-read: none, Part A of `s18_defensive_prompting.ipynb` is self-contained. Terms: `module02/terms_s18.md`. Attacks Session 16's classifier on purpose
+with 16 adversarial tickets across four families (override, authority, exfiltrate, smuggle), then hardens the system prompt with an instruction
+hierarchy and a scratchpad/final reply split, and re-measures. Session 16's own held-out set checks the defense did not break ordinary accuracy.
+**Budget:** about 50,000-80,000 tokens of a free key's 200,000-a-day limit (16 attack tickets + 20 clean tickets, each prompt). Your submission is
+`experiments/s18_defense.md`, pushed to **your own** `genai-course-work` repository; your Session 16 files are read, not changed. The checkpoint test
+is skipped without a key (read the reason with `-rs`: a skip is not a pass).
+
 ## Layout
 ```
 module01/                   Sessions 9a-13 notebooks, helpers, pre-reads
@@ -238,7 +254,8 @@ tests/test_s14.py           Session 14 checkpoint
 tests/test_s15.py           Session 15 checkpoint
 tests/test_s16.py           Session 16 checkpoint
 tests/test_s17.py           Session 17 checkpoint
-module02/                   Module 2 (prompt engineering): S14-S17 notebooks, helpers, work-repo steps
+tests/test_s18.py           Session 18 checkpoint
+module02/                   Module 2 (prompt engineering): S14-S18 notebooks, helpers, work-repo steps
 cheatsheet/python-for-agents.md
 tools/update_course.py      safe update: back up your edited notebooks, then git pull
 UPDATING.md                 how to update when git pull refuses
