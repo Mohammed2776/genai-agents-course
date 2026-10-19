@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -216,3 +217,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+=======
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.vscode/
+.DS_Store
+agent.py
+module01/s10_matrix_output.md
+.ipynb_checkpoints/
+>>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec

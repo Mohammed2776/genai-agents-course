@@ -82,8 +82,45 @@ def test_live_groq_classifies_a_clear_ticket():
 @pytest.mark.skipif(not HAS_GEMINI, reason="no Gemini key in .env")
 def test_live_gemini_classifies_a_clear_ticket():
     client = gemini_client()
+<<<<<<< HEAD
     model = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
+=======
+    model = os.getenv("GEMINI_MODEL") or "gemini-flash-latest"   # blank in .env means "use the default"
+>>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
     tid, text = CLEAR_TICKETS[1]  # technical_clear
     result = classify_ticket(client, model, text, temperature=0.0)
     assert result["valid"], f"unexpected label: {result['label']!r}"
     assert result["label"] == "technical"
+<<<<<<< HEAD
+=======
+
+
+# ---------------------------------------------------------------- Gemini model picking (names rotate and retire)
+STUDENT_LIST = ["models/gemini-2.5-flash", "models/gemini-2.5-flash-image", "models/gemini-2.5-flash-lite",
+                "models/gemini-2.5-flash-native-audio-latest", "models/gemini-2.5-flash-preview-tts",
+                "models/gemini-3-flash-preview", "models/gemini-3.1-flash-image", "models/gemini-3.5-flash",
+                "models/gemini-3.8-flash", "models/gemini-3.8-flash-tts", "models/gemini-flash-latest",
+                "models/gemini-flash-lite-latest", "models/gemini-omni-1.1-flash"]
+
+
+def _fake_gemini(monkeypatch, ids):
+    import providers_utils
+    fake = type("C", (), {"models": type("M", (), {"list": lambda self: [type("X", (), {"id": i})() for i in ids]})()})()
+    monkeypatch.setattr(providers_utils, "gemini_client", lambda: fake)
+
+
+def test_list_gemini_models_drops_non_chat_models_and_the_models_prefix(monkeypatch):
+    from providers_utils import list_gemini_models
+    _fake_gemini(monkeypatch, STUDENT_LIST)
+    names = list_gemini_models()
+    assert "gemini-3.8-flash" in names and "gemini-flash-latest" in names
+    assert not any(bad in n for n in names for bad in ("image", "tts", "audio", "omni")) and not any(n.startswith("models/") for n in names)
+
+
+def test_pick_gemini_model_prefers_the_latest_alias_then_the_highest_plain_version():
+    from providers_utils import pick_gemini_model
+    assert pick_gemini_model(["gemini-2.5-flash", "gemini-flash-latest"]) == "gemini-flash-latest"
+    assert pick_gemini_model(["gemini-2.5-flash", "gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.8-flash-lite"]) == "gemini-3.8-flash"
+    assert pick_gemini_model(["gemini-3-flash-preview"]) is None
+    assert pick_gemini_model([]) is None
+>>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
