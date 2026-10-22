@@ -30,39 +30,11 @@ def ollama_client() -> OpenAI:
     return OpenAI(base_url="http://localhost:11434/v1", api_key="ollama")
 
 
-<<<<<<< HEAD
 def list_gemini_models() -> list[str]:
     """Model names change often on Gemini's Flash tier. Run this instead of trusting
     a name written down months ago — same idea as list_models.py for Groq."""
     client = gemini_client()
     return sorted(m.id for m in client.models.list() if "flash" in m.id.lower())
-=======
-# Gemini lists many "flash" models that are NOT text chat models. Skip those.
-_NON_CHAT = ("image", "tts", "audio", "live", "embed", "omni", "native")
-
-
-def list_gemini_models() -> list[str]:
-    """Chat-capable Gemini Flash models your key can see, as bare names (no 'models/' prefix).
-    Names change often and old ones get retired for new accounts - ask, don't memorise."""
-    client = gemini_client()
-    names = (m.id.removeprefix("models/") for m in client.models.list())
-    return sorted(n for n in names if "flash" in n.lower() and not any(bad in n.lower() for bad in _NON_CHAT))
-
-
-def pick_gemini_model(available: list[str]) -> str | None:
-    """Choose a sensible default from what the key can actually see:
-    the 'gemini-flash-latest' alias if offered, otherwise the highest-numbered plain
-    'gemini-X.Y-flash' (no preview, no lite). Returns None if nothing suitable is listed."""
-    import re
-    if "gemini-flash-latest" in available:
-        return "gemini-flash-latest"
-    versions = []
-    for n in available:
-        m = re.fullmatch(r"gemini-(\d+(?:\.\d+)?)-flash", n)
-        if m:
-            versions.append((float(m.group(1)), n))
-    return max(versions)[1] if versions else None
->>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
 
 
 # ---------------------------------------------------------------- one call, any provider
@@ -77,10 +49,7 @@ def ask(client: OpenAI, model: str, system: str, user: str, *, temperature: floa
     if stop:
         kwargs["stop"] = stop
     r = client.chat.completions.create(**kwargs)
-<<<<<<< HEAD
     
-=======
->>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
     return {
         "text": r.choices[0].message.content,
         "prompt_tokens": r.usage.prompt_tokens,
@@ -98,14 +67,6 @@ CLASSIFIER_SYSTEM = (
 
 def classify_ticket(client: OpenAI, model: str, ticket_text: str, *, temperature: float = 0.0) -> dict:
     """Same shape as ask(), specialised for the sweep: one word in, one label out."""
-<<<<<<< HEAD
     result = ask(client, model, CLASSIFIER_SYSTEM, ticket_text, temperature=temperature, max_tokens=300)
     label = result["text"].strip().lower().strip(".")
-=======
-    # max_tokens is a safety ceiling, not a target. Reasoning models (like the course's gpt-oss-20b) spend hidden
-    # "thinking" tokens from the same budget before the one-word answer, so a tiny ceiling such as 10 leaves an
-    # empty reply. 1000 leaves room to think; a one-word answer still costs only what it uses.
-    result = ask(client, model, CLASSIFIER_SYSTEM, ticket_text, temperature=temperature, max_tokens=1000)
-    label = (result["text"] or "").strip().lower().strip(".")
->>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
     return {**result, "label": label, "valid": label in {"billing", "technical", "general"}}
