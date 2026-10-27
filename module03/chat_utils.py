@@ -188,7 +188,7 @@ def check_s19_work(repo_path) -> list:
 
     report_file = repo / REPORT_PATH
     if not report_file.exists():
-        out.append(ck("chat memory report exists", False, f"{REPORT_PATH} not found. Run notebook section 9 with SAVE_REPORT = True."))
+        out.append(ck("chat memory report exists", False, f"{REPORT_PATH} not found. Run notebook section 10 with SAVE_REPORT = True."))
         return out
     out.append(ck("chat memory report exists", True))
 
@@ -196,7 +196,7 @@ def check_s19_work(repo_path) -> list:
     rows = parse_chat_report(text)
     have_all = set(rows) == set(STRATEGIES)
     out.append(ck("report covers all three strategies (naive, window, summarize)", have_all,
-                  f"found {sorted(rows)}, need all three: {list(STRATEGIES)}. Re-save the report from section 9."))
+                  f"found {sorted(rows)}, need all three: {list(STRATEGIES)}. Re-save the report from section 10."))
     if not have_all:
         return out
 
