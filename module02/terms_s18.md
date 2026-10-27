@@ -12,6 +12,7 @@
 | Defense-in-depth | Several independent layers (hardened prompt, sealed scratchpad, output-side check) so one failing layer doesn't fail the whole system. | A vault with a lock, a guard, and a camera. | Module 12; S54 LLMOps |
 | Obfuscation attack | Hiding an instruction from a keyword filter — scrambled letters, Base64/hex, invisible Unicode — while the model still reads it correctly. | A note written in code your teacher can't read but your friend can. | C6 assignment; Module 12 |
 | Typoglycemia | The real phenomenon where both humans and models read a word correctly even with its middle letters scrambled, as long as the first and last letters stay put. | "Cna yuo sltil raed tihs?" — yes, and so can the model. | C6 assignment |
+| Best-of-N (BoN) jailbreaking | Generating many small variations of one attack (capitals, spacing, rewording) and trying them until one gets through. A 2024 study reported 89% success on GPT-4o and 78% on Claude 3.5 Sonnet with up to 10,000 variations per request, for those tested setups. | Keep rattling every key on the ring until one turns. | C2 honest limits; S23 rate limits; Module 12 |
 
 ## Further reading: OWASP LLM Prompt Injection Prevention Cheat Sheet
 Source for the Best-of-N statistic and the typoglycemia example in C2/C6 of the notebook:
