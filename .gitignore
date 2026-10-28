@@ -8,3 +8,6 @@ __pycache__/
 agent.py
 module01/s10_matrix_output.md
 .ipynb_checkpoints/
+
+# Instructor-only material (decks, delivery guides) - never push
+/S[0-9]*/
