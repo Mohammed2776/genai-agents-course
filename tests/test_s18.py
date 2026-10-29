@@ -286,3 +286,13 @@ def test_checkpoint_your_defense_report_is_complete():
         print(f"  {'PASS' if r.passed else 'FAIL'}  {r.name}" + (f"   ({r.detail})" if r.detail else ""))
     failed = [r for r in results if not r.passed]
     assert not failed, "fix the FAILs above, then run this again"
+
+
+# ---------------------------------------------------------------- the extra, unscored obfuscation attack
+def test_extra_attacks_stay_out_of_the_scored_set():
+    from defense_tasks import EXTRA_ATTACKS
+    assert len(ATTACKS) == 16                      # the report, checkpoint and Gate 1 are calibrated to 16
+    assert EXTRA_ATTACKS and not set(EXTRA_ATTACKS) & set(ATTACKS)
+    for text, truth, family in EXTRA_ATTACKS:
+        assert truth in ("card", "loan", "account", "other") and family == "obfuscation"
+        assert "ignore" not in text.lower()        # the point: the literal keyword never appears

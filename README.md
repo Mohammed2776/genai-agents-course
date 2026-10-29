@@ -240,6 +240,24 @@ hierarchy and a scratchpad/final reply split, and re-measures. Session 16's own 
 `experiments/s18_defense.md`, pushed to **your own** `genai-course-work` repository; your Session 16 files are read, not changed. The checkpoint test
 is skipped without a key (read the reason with `-rs`: a skip is not a pass).
 
+## Session 19 — chat state & memory windows: a conversation that actually remembers
+
+```powershell
+git pull
+uv sync                                  # no new packages
+uv run jupyter lab module03/s19_chat_memory.ipynb
+$env:WORK_REPO = "$HOME\Documents\genai-course-work"
+uv run pytest tests/test_s19.py -rs      # checkpoint: all three memory strategies scored, naive recalls, both fixes cost less
+```
+Pre-read: Part A of `s19_chat_memory.ipynb` is self-contained. Terms: `module03/terms_s19.md`. Starts Module 3 (LLM Applications) with a new,
+standalone running example — BankAssist, a bank product-FAQ assistant — built around one fact every session depends on: an API call is stateless,
+and "the assistant remembers" is your own code resending the conversation's `messages` list on every call. Builds a real 17-turn scripted conversation
+with a fact planted at turn 2 and asked for back at turn 17, measures the naive (resend-everything) cost growth, then fixes it two ways — a sliding
+window (flat cost, silent forgetting) and summarization (recovers recall, one extra call, a new risk of a wrong summary) — and compares all three
+honestly rather than assuming either fix "just works." **Budget:** about 20,000-35,000 tokens of a free key's 200,000-a-day limit (three 17-turn
+conversations, plus summarization's own extra calls). Your submission is `experiments/s19_chat_memory.md`, pushed to **your own** `genai-course-work`
+repository. The checkpoint test is skipped without a key (read the reason with `-rs`: a skip is not a pass).
+
 ## Layout
 ```
 module01/                   Sessions 9a-13 notebooks, helpers, pre-reads
@@ -259,7 +277,9 @@ tests/test_s15.py           Session 15 checkpoint
 tests/test_s16.py           Session 16 checkpoint
 tests/test_s17.py           Session 17 checkpoint
 tests/test_s18.py           Session 18 checkpoint
+tests/test_s19.py           Session 19 checkpoint
 module02/                   Module 2 (prompt engineering): S14-S18 notebooks, helpers, work-repo steps
+module03/                   Module 3 (LLM applications): S19-S23 notebooks, helpers, work-repo steps
 cheatsheet/python-for-agents.md
 tools/update_course.py      safe update: back up your edited notebooks, then git pull
 UPDATING.md                 how to update when git pull refuses

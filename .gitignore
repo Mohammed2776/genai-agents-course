@@ -228,4 +228,10 @@ __pycache__/
 agent.py
 module01/s10_matrix_output.md
 .ipynb_checkpoints/
+<<<<<<< HEAD
 >>>>>>> 7ee871b160008f5a9e609d8ba0a2dd2fb2b1dbec
+=======
+
+# Instructor-only material (decks, delivery guides) - never push
+/S[0-9]*/
+>>>>>>> 1f781f387704d7e2a1b9a4d8c16fa235bab24dc3
