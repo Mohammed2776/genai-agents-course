@@ -307,9 +307,61 @@ uv run pytest tests/test_s22.py -rs      # checkpoint: tests the functions YOU w
 Pre-read: Part A of `s22_litellm_build.ipynb`. Terms: `module03/terms_s22.md`. Build-your-own, like Session 21: in
 `s22/bankassist_llm.py` (your own work repo) you call any provider with one `completion()` call, compare two models by
 changing a string, add a Router that falls back when the primary fails (you break the primary on purpose), and log
-tokens, cost and latency per request. Your models come from your existing `.env` (Groq `gpt-oss-20b` primary, a smaller
-Groq model as fallback; Ollama users see the notebook's table). ChatGPT: paste `module03/s22_version_card.md` first,
+tokens, cost and latency per request. Your models come from your existing `.env` (Groq `gpt-oss-20b` primary, the larger
+`gpt-oss-120b` as fallback; Ollama users see the notebook's table). ChatGPT: paste `module03/s22_version_card.md` first,
 never paste your `.env` or key. Stuck? `module03/s22_common_errors.md`. **Budget:** a few thousand tokens.
+
+## Session 23 — serving BankAssist: FastAPI, memory per session, streaming
+
+```powershell
+git pull
+uv sync                                  # NEW: fastapi==0.162.0 and uvicorn==0.54.0 (pinned)
+$env:WORK_REPO = "$HOME\Documents\genai-course-work"
+uv run jupyter lab module03/s23_serving.ipynb             # Section 1 copies the starter into your work repo
+uv run python $env:WORK_REPO\s23\app.py                  # terminal 1: YOUR server on http://127.0.0.1:8000 (/docs to try it)
+# Stuck, or want to see it working first?  module03\s23_simple.py is a COMPLETE server: copy it to $env:WORK_REPO\s23\app.py,
+# run it the same way, then change one CHANGE ME line at a time (memory window, /health, prompt, step cap, request size).
+uv run python module03/s23_client.py                     # terminal 2: talks to it - memory, sessions, 422, a streamed answer
+uv run pytest tests/test_s23.py -rs      # checkpoint: tests YOUR endpoints with a scripted model (offline, no tokens)
+```
+Pre-read: Part A of `s23_serving.ipynb`. Terms: `module03/terms_s23.md`. You write `s23/app.py` in **your own** work repository from
+`module03/s23_starter.py`. PART 1 is given: Session 21's BankAssist, now streaming. PART 2 is yours, with six TODOs: `GET /health`, Pydantic
+request and response models, a sliding-window `window()`, `POST /chat` with one memory per `session_id`, `POST /chat/stream` as Server-Sent
+Events, and a stretch `DELETE /sessions/{id}`. ChatGPT: paste `module03/s23_version_card.md` first. Stuck? `module03/s23_common_errors.md`.
+Section 10 bridges to LiteLLM (S22) and the gateway (S23b). **Homework, required for Session 23b:** Docker Desktop installed and
+`docker run hello-world` working. Submission: commit and push `s23/app.py`.
+
+## Session 23b — Gateway + Docker: the LiteLLM proxy, in containers
+
+```powershell
+git pull
+docker run hello-world                                    # Docker must work (homework); no Docker? see Path B in the lab
+cd module03\s23b_gateway ; docker compose up --build litellm      # terminal 1: the gateway on http://localhost:4000
+uv run python module03/s23b_client.py                    # terminal 2 (course repo folder): answer, model group, fallbacks, cost
+docker compose up --build                                 # gateway + a tiny FastAPI app -> http://localhost:8000/docs
+uv run pytest tests/test_s23b.py -rs                      # checkpoint (offline; plus a live check while the gateway runs)
+```
+Lab guide: `module03/s23b_lab.md` (a terminal session, no notebook). Terms: `module03/terms_s23b.md`. Errors: `module03/s23b_common_errors.md`.
+LiteLLM from S22, now run as a **gateway server**: `config.yaml` maps the model groups `shopassist` / `shopassist-backup` to Groq models
+with a fallback; apps send one URL and one key. You call it with raw HTTP and with LangChain, break the primary model in `config.yaml` and
+watch the gateway fall back, then start the gateway and an app together with Docker Compose. Your Groq key stays in your course `.env`
+(`API_KEY`) and never enters an image. Prepares Mini-Project 1 (ShopAssist).
+
+## Mini-Project 1 — ShopAssist (weekend, 2 × 2.5 h, solo)
+
+```powershell
+git pull
+# on GitHub: create an EMPTY repo called shopassist-mp1, then git clone it (e.g. into Documents)
+$env:MP1_REPO = "$HOME\Documents\shopassist-mp1"
+uv run python module03/mp1_setup.py                       # copies the starter + writes YOUR repo's .env (git-ignored)
+cd $env:MP1_REPO ; uv sync ; docker compose up --build    # gateway + ShopAssist -> http://localhost:8000/docs
+uv run python eval/run_eval.py                            # evidence: 10 golden, a memory probe, 4 attacks
+cd <course repo> ; uv run pytest tests/test_mp1.py -rs    # checkpoint (offline; reads YOUR repo via MP1_REPO)
+```
+Errors: `module03/mp1_common_errors.md`. A new app, built alone: order support for Northwind Store (a fictional online store) with
+LangChain tools, per-session memory, a defended prompt and streamed answers (S18-S23), reaching Groq **only through the LiteLLM
+gateway** and run with Docker Compose (S23b). Six tasks (T1-T6): return rules, argument validation, Security rules, memory choice,
+`/health`, and the README/report. Commit after each task. BankAssist stays the practice app.
 
 ## Layout
 ```
@@ -334,6 +386,11 @@ tests/test_s19.py           Session 19 checkpoint
 tests/test_s20.py           Session 20 checkpoint
 tests/test_s21.py           Session 21 checkpoint (tests your own s21/bankassist_lc.py)
 tests/test_s22.py           Session 22 checkpoint (tests your own s22/bankassist_llm.py)
+tests/test_s23.py           Session 23 checkpoint (tests your own s23/app.py)
+tests/test_s23b.py          Session 23b checkpoint (gateway files; live check while the gateway runs)
+module03/s23b_gateway/      Session 23b gateway: config.yaml, docker-compose.yml, proxy + hello_app Dockerfiles
+tests/test_mp1.py           Mini-Project 1 checkpoint (tests your own shopassist-mp1 repo)
+module03/mp1_starter/       Mini-Project 1 starter: ShopAssist app, gateway, Compose, eval set
 module02/                   Module 2 (prompt engineering): S14-S18 notebooks, helpers, work-repo steps
 module03/                   Module 3 (LLM applications): S19-S23 notebooks, helpers, work-repo steps
 cheatsheet/python-for-agents.md
