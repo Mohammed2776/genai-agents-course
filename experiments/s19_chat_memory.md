@@ -1,6 +1,6 @@
 # Session 19: chat state & memory windows - naive vs sliding window vs summarization
 
-Model: `openai/gpt-oss-20b` · Date: 2026-10-29 · Scripted conversation: 17 turns, a reference number planted at turn 2, asked for again at turn 17
+Model: `openai/gpt-oss-20b` · Date: 2026-11-11 · Scripted conversation: 17 turns, a reference number planted at turn 2, asked for again at turn 17
 
 | Strategy | Turn-17 cost (tokens) | Recall succeeded |
 |---|---|---|
