@@ -235,4 +235,12 @@ module01/s10_matrix_output.md
 
 # Instructor-only material (decks, delivery guides) - never push
 /S[0-9]*/
+<<<<<<< HEAD
 >>>>>>> 1f781f387704d7e2a1b9a4d8c16fa235bab24dc3
+=======
+
+# Session 24: cached help-centre vectors (rebuilt automatically)
+module04/.s24_cache/
+module04/.s25_chroma/
+module04/.s26_qdrant/
+>>>>>>> b8f13eb9acefeb68bfd2fc61f15fff73fe7b2d9a
